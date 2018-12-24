@@ -41,7 +41,7 @@ let flying = o => {
     let isFlying = false;
 
     return Object.assign({}, o, {
-        fly() {        //was wondering why you can't use ES6 arrow functions when defining object literals
+        fly() {        //you can use ES6 arrow functions when defining object literals, but not when working with 'this'
             isFlying = true;
             return this;
         },
@@ -58,3 +58,22 @@ let flying = o => {
 console.log(flying({}));
 console.log(flying({}).fly().isFlying());
 console.log(flying({}).land().isFlying());
+
+const quacking = quack => o => Object.assign({}, o, {
+    quack: () => quack
+});
+
+var createDuck = quack => quacking(quack)(flying({}));
+var myDuck = createDuck("Quack!");
+console.log("myDuck quacks: " + myDuck.quack());
+console.log("myDuck flies : " + myDuck.fly().isFlying())
+
+//with pipe
+const pipe = (...fns) => x => fns.reduce((acc, currentFunction) => currentFunction(acc), x);
+createDuck = quack => pipe(
+    quacking(quack),
+    flying
+)({});
+myDuck = createDuck('Big QUACK!');
+console.log("myDuck quacks: " + myDuck.quack());
+console.log("myDuck flies : " + myDuck.fly().isFlying())
